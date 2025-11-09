@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Collaborative Drawing Canvas</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <!-- Connection Status -->
+  <div id="connectionStatus" class="connection-status">
+    <div class="status-dot"></div>
+    <span class="status-text">Connecting...</span>
+  </div>
+
+  <!-- Main Toolbar -->
+  <div class="toolbar-container">
+    <div class="toolbar">
+      <div class="toolbar-section">
+        <h3 class="toolbar-title">Tools</h3>
+        <div class="tool-group">
+          <button id="tool-brush" class="tool-btn active" data-tool="brush" title="Brush (B)">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M9.06 11.9l8.07-8.06a2.85 2.85 0 1 1 4.03 4.03l-8.06 8.08"/>
+              <path d="M21.5 2.5L19 5M11.5 12.5L7 17M5 19l-1.5 1.5M2.5 21.5L5 19M7 17l-1.5-1.5"/>
+            </svg>
+            <span>Brush</span>
+          </button>
+          <button id="tool-eraser" class="tool-btn" data-tool="eraser" title="Eraser (E)">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="m7 21-4.3-4.3c-1-1-1-2.5 0-3.4l9.6-9.6c1-1 2.5-1 3.4 0l5.3 5.3c1 1 1 2.5 0 3.4L13 21"/>
+              <path d="M22 21H7"/>
+              <path d="m5 11 9 9"/>
+            </svg>
+            <span>Eraser</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="toolbar-divider"></div>
+
+      <div class="toolbar-section">
+        <h3 class="toolbar-title">Color</h3>
+        <div class="color-picker-wrapper">
+          <input type="color" id="color" value="#000000" class="color-input">
+          <div class="color-preview" id="colorPreview"></div>
+        </div>
+        <div class="color-presets">
+          <button class="color-preset" data-color="#000000" style="background: #000000" title="Black"></button>
+          <button class="color-preset" data-color="#FF0000" style="background: #FF0000" title="Red"></button>
+          <button class="color-preset" data-color="#00FF00" style="background: #00FF00" title="Green"></button>
+          <button class="color-preset" data-color="#0000FF" style="background: #0000FF" title="Blue"></button>
+          <button class="color-preset" data-color="#FFFF00" style="background: #FFFF00" title="Yellow"></button>
+          <button class="color-preset" data-color="#FF00FF" style="background: #FF00FF" title="Magenta"></button>
+          <button class="color-preset" data-color="#00FFFF" style="background: #00FFFF" title="Cyan"></button>
+          <button class="color-preset" data-color="#FFA500" style="background: #FFA500" title="Orange"></button>
+        </div>
+      </div>
+
+      <div class="toolbar-divider"></div>
+
+      <div class="toolbar-section">
+        <h3 class="toolbar-title">Brush Size</h3>
+        <div class="size-control">
+          <input type="range" id="size" min="1" max="50" value="5" class="size-slider">
+          <div class="size-display">
+            <span id="sizeValue">5</span>
+            <div class="size-preview" id="sizePreview"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="toolbar-divider"></div>
+
+      <div class="toolbar-section">
+        <h3 class="toolbar-title">Actions</h3>
+        <div class="action-group">
+          <button id="undo" class="action-btn" title="Undo (Ctrl+Z)">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M3 7v6h6"/>
+              <path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13"/>
+            </svg>
+            <span>Undo</span>
+          </button>
+          <button id="redo" class="action-btn" title="Redo (Ctrl+Y)">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 7v6h-6"/>
+              <path d="M3 17a9 9 0 0 1 9-9 9 9 0 0 1 6 2.3L21 13"/>
+            </svg>
+            <span>Redo</span>
+          </button>
+          <button id="clear" class="action-btn danger" title="Clear Canvas">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+            </svg>
+            <span>Clear</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Users Panel -->
+  <div class="users-panel">
+    <div class="users-header">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+        <circle cx="9" cy="7" r="4"/>
+        <path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>
+      </svg>
+      <h3>Online Users</h3>
+      <span class="user-count" id="userCount">0</span>
+    </div>
+    <div class="users-list" id="userList"></div>
+  </div>
+
+  <!-- Canvas -->
+  <canvas id="canvas"></canvas>
+
+  <!-- Toast Notifications -->
+  <div id="toastContainer" class="toast-container"></div>
+
+  <!-- Keyboard Shortcuts Help -->
+  <button id="helpBtn" class="help-btn" title="Keyboard Shortcuts">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <circle cx="12" cy="12" r="10"/>
+      <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3M12 17h.01"/>
+    </svg>
+  </button>
+
+  <div id="helpModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Keyboard Shortcuts</h2>
+        <button class="modal-close" id="closeHelp">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="shortcut-item">
+          <kbd>B</kbd>
+          <span>Switch to Brush tool</span>
+        </div>
+        <div class="shortcut-item">
+          <kbd>E</kbd>
+          <span>Switch to Eraser tool</span>
+        </div>
+        <div class="shortcut-item">
+          <kbd>Ctrl</kbd> + <kbd>Z</kbd>
+          <span>Undo last action</span>
+        </div>
+        <div class="shortcut-item">
+          <kbd>Ctrl</kbd> + <kbd>Y</kbd>
+          <span>Redo last action</span>
+        </div>
+        <div class="shortcut-item">
+          <kbd>Ctrl</kbd> + <kbd>+</kbd>
+          <span>Increase brush size</span>
+        </div>
+        <div class="shortcut-item">
+          <kbd>Ctrl</kbd> + <kbd>-</kbd>
+          <span>Decrease brush size</span>
+        </div>
+        <div class="shortcut-item">
+          <kbd>?</kbd>
+          <span>Show this help</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="websocket.js"></script>
+  <script src="canvas.js"></script>
+  <script src="main.js"></script>
+</body>
+</html>
